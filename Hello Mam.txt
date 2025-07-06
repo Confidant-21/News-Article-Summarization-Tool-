@@ -1,0 +1,41 @@
+Hello Mam
+
+This is our NLP project, a News Research Tool that can answer questions based on the articles we provide.
+
+
+
+
+
+
+
+
+
+This are the articles:
+
+Article 1 : https://economictimes.indiatimes.com/industry/auto/two-wheelers-three-wheelers/bajaj-auto-launches-worlds-first-cng-bike-freedom-125-check-price-mileage-and-other-features/articleshow/111508679.cms?from=mdr
+
+Article 2 : https://www.thehindu.com/business/Industry/bajaj-auto-unveils-cng-motorcycle-freedom-at-prices-starting-95000/article68370659.ece
+
+Article 3: https://www.thehindubusinessline.com/companies/bajaj-auto-launches-worlds-first-cng-powered-bike/article68370491.ece
+
+Questions:
+
+
+1) What is the mileage and fuel efficiency of the new Bajaj CNG bike compared to conventional petrol bikes?
+
+The Bajaj CNG bike offers about 50% cost savings by significantly reducing fuel expenses compared to similar petrol motorcycles. The CNG tank provides a range of over 200 km on just 2 kg of CNG fuel. Additionally, it has a 2-liter petrol tank which performs as a range extender, offering over 130 km of range in case the CNG tank empties.
+
+
+
+2) How does the performance and engine power of the Bajaj CNG bike differ from other Bajaj petrol models?
+
+There is no information in the provided text about how the performance and engine power of the Bajaj CNG bike differ from other Bajaj petrol models.
+
+3) What safety measures and features have been included in the Bajaj CNG bike to address the risks associated with CNG fuel?
+
+The provided text states that the Bajaj CNG bike has undergone rigorous testing to ensure safety. However, the text does not provide details on specific safety measures and features included in the Bajaj CNG bike to address the risks associated with CNG fuel.
+
+Sources:
+https://www.thehindubusinessline.com/companies/bajaj-auto-launches-worlds-first-cng-powered-bike/article68370491.ece, https://www.thehindu.com/business/Industry/bajaj-auto-unveils-cng-motorcycle-freedom-at-prices-starting-95000/article68370659.ece, https://economictimes.indiatimes.com/industry/auto/two-wheelers-three-wheelers/bajaj-auto-launches-worlds-first-cng-bike-freedom-125-check-price-mileage-and-other-features/articleshow/111508679.cms?from=mdr
+
+thankyou
