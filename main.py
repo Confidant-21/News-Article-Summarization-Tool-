@@ -8,7 +8,7 @@ from langchain.embeddings.base import Embeddings
 from langchain_google_genai import ChatGoogleGenerativeAI
 from sentence_transformers import SentenceTransformer
 
-
+os.environ["UNSTRUCTURED_DISABLE_NOTICE"] = "1"
 # Streamlit UI Configuration
 st.set_page_config(page_title="News Research Tool", page_icon="📈")
 st.title("News Research Tool 📈")
