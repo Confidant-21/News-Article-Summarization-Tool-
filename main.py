@@ -1,83 +1,109 @@
 import os
 import streamlit as st
-import pickle
-import time
 from langchain.chains import RetrievalQAWithSourcesChain
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.document_loaders import UnstructuredURLLoader
 from langchain.vectorstores.faiss import FAISS
 from langchain.embeddings.base import Embeddings
-from langchain.docstore.document import Document
-from api_key import google_gemini_key
 from langchain_google_genai import ChatGoogleGenerativeAI
 from sentence_transformers import SentenceTransformer
 
-# Custom wrapper for SentenceTransformer
-class MiniLMEmbeddings(Embeddings):
-    def __init__(self, model_name: str = "sentence-transformers/all-MiniLM-L6-v2"):
-        self.model = SentenceTransformer(model_name)
-
-    def embed_documents(self, texts):
-        return self.model.encode(texts, show_progress_bar=True)
-
-    def embed_query(self, text):
-        return self.model.encode([text])[0]
-
-# Streamlit UI
-st.title(" News Research Tool 📈")
+# Streamlit UI Configuration
+st.set_page_config(page_title="News Research Tool", page_icon="📈")
+st.title("News Research Tool 📈")
 st.sidebar.title("News Article URLs")
 
 urls = []
 for i in range(3):
-    url = st.sidebar.text_input(f"URL {i+1}")
+    url = st.sidebar.text_input(f"URL {i+1}", key=f"url_{i}")
     urls.append(url)
 
 process_url_clicked = st.sidebar.button("Process URLs")
-file_path = "faiss_store_miniLM.pkl"
-
 main_placeholder = st.empty()
+
+# Retrieve Gemini API Key securely from Streamlit Secrets
+# (Make sure to add GOOGLE_GEMINI_KEY in your Streamlit Cloud app settings)
+try:
+    gemini_api_key = st.secrets["GOOGLE_GEMINI_KEY"]
+except Exception:
+    gemini_api_key = os.environ.get("GOOGLE_GEMINI_KEY", "")
 
 # LLM setup
 llm = ChatGoogleGenerativeAI(
     model="gemini-2.0-flash",
-    google_api_key=google_gemini_key,
+    google_api_key=gemini_api_key,
     temperature=0.7
 )
 
+# Custom wrapper for SentenceTransformer with Streamlit Caching for RAM optimization
+class MiniLMEmbeddings(Embeddings):
+    def __init__(self, model_name: str = "sentence-transformers/all-MiniLM-L6-v2"):
+        self.model = self.load_model(model_name)
+
+    @staticmethod
+    @st.cache_resource
+    def load_model(model_name):
+        return SentenceTransformer(model_name)
+
+    def embed_documents(self, texts):
+        return self.model.encode(texts, show_progress_bar=False).tolist()
+
+    def embed_query(self, text):
+        return self.model.encode([text])[0].tolist()
+
+# Initialize session state for vectorstore so it persists across UI interactions
+if "vectorstore" not in st.session_state:
+    st.session_state.vectorstore = None
+
 if process_url_clicked:
-    loader = UnstructuredURLLoader(urls=urls)
-    main_placeholder.text("Data Loading...Started...✅✅✅")
-    data = loader.load()
+    # Filter out empty URLs
+    valid_urls = [u for u in urls if u.strip()]
+    if not valid_urls:
+        st.error("Please enter at least one valid URL.")
+    else:
+        try:
+            with st.spinner("Processing URLs..."):
+                loader = UnstructuredURLLoader(urls=valid_urls)
+                main_placeholder.text("Data Loading...Started...✅✅✅")
+                data = loader.load()
 
-    text_splitter = RecursiveCharacterTextSplitter(
-        separators=['\n\n', '\n', '.', ','],
-        chunk_size=1000
-    )
-    main_placeholder.text("Text Splitting...Started...✅✅✅")
-    docs = text_splitter.split_documents(data)
+                text_splitter = RecursiveCharacterTextSplitter(
+                    separators=['\n\n', '\n', '.', ','],
+                    chunk_size=1000
+                )
+                main_placeholder.text("Text Splitting...Started...✅✅✅")
+                docs = text_splitter.split_documents(data)
 
-    embeddings = MiniLMEmbeddings()
-    main_placeholder.text("Creating Embeddings and Building Index...✅✅✅")
-    vectorstore = FAISS.from_documents(docs, embeddings)
+                embeddings = MiniLMEmbeddings()
+                main_placeholder.text("Creating Embeddings and Building Index...✅✅✅")
+                
+                # Store directly in session state instead of local disk pickle
+                st.session_state.vectorstore = FAISS.from_documents(docs, embeddings)
 
-    with open(file_path, "wb") as f:
-        pickle.dump(vectorstore, f)
+                main_placeholder.text("FAISS Index Built and Ready in Memory! 🚀")
+        except Exception as e:
+            st.error(f"An error occurred during processing: {e}")
 
-    main_placeholder.text("FAISS Index Saved Successfully! 🚀")
-
-query = main_placeholder.text_input("Question: ")
+query = st.text_input("Question: ")
 if query:
-    if os.path.exists(file_path):
-        with open(file_path, "rb") as f:
-            vectorstore = pickle.load(f)
-            chain = RetrievalQAWithSourcesChain.from_llm(llm=llm, retriever=vectorstore.as_retriever())
+    if st.session_state.vectorstore is not None:
+        try:
+            chain = RetrievalQAWithSourcesChain.from_llm(
+                llm=llm, 
+                retriever=st.session_state.vectorstore.as_retriever()
+            )
             result = chain({"question": query}, return_only_outputs=True)
 
             st.header("Answer")
-            st.write(result["answer"])
+            st.write(result.get("answer", "No answer found."))
 
             sources = result.get("sources", "")
             if sources:
                 st.subheader("Sources:")
                 for source in sources.split("\n"):
-                    st.write(source)
+                    if source.strip():
+                        st.write(source)
+        except Exception as e:
+            st.error(f"An error occurred while generating the answer: {e}")
+    else:
+        st.warning("Please enter URLs and click 'Process URLs' first to build the knowledge base.")
