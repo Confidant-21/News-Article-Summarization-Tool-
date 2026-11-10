@@ -1,12 +1,13 @@
 import os
 import streamlit as st
 from langchain_classic.chains import RetrievalQAWithSourcesChain
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.document_loaders import UnstructuredURLLoader
-from langchain.vectorstores.faiss import FAISS
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_community.document_loaders import UnstructuredURLLoader
+from langchain_community.vectorstores import FAISS
 from langchain.embeddings.base import Embeddings
 from langchain_google_genai import ChatGoogleGenerativeAI
 from sentence_transformers import SentenceTransformer
+
 
 # Streamlit UI Configuration
 st.set_page_config(page_title="News Research Tool", page_icon="📈")
