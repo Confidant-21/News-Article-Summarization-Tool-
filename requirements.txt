@@ -6,9 +6,7 @@ langchain-text-splitters
 langchain-google-genai>=0.0.5
 sentence-transformers>=2.2.2
 faiss-cpu>=1.7.4
-unstructured>=0.10.25
-spacy[full]>=3.8.0
+beautifulsoup4
 tqdm
 transformers>=4.36.0
 numpy>=1.24.0
-libmagic; platform_system != "Windows"
