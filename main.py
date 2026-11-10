@@ -1,6 +1,6 @@
 import os
 import streamlit as st
-from langchain.chains import RetrievalQAWithSourcesChain
+from langchain_classic.chains import RetrievalQAWithSourcesChain
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.document_loaders import UnstructuredURLLoader
 from langchain.vectorstores.faiss import FAISS

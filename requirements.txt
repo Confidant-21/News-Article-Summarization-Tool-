@@ -1,5 +1,6 @@
 streamlit>=1.31
-langchain>=0.1.13
+langchain>=1.0.0
+langchain-classic
 langchain-google-genai>=0.0.5
 sentence-transformers>=2.2.2
 faiss-cpu>=1.7.4
